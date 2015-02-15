@@ -95,7 +95,7 @@ int createBmpFile(const char *path, int px, int py, unsigned short BitPerPixel, 
     {
         fwrite(buf, px * BytePerPixel, 1, f);
         buf+=px * BytePerPixel;
-        for (int j; j < AddByte; j)
+        for (int j = 0; j < AddByte; j++)
             fputc(0,f);
     }
     fclose(f);
@@ -126,29 +126,62 @@ unsigned char *getRundBufBW24(int arrSize)
     return buf;
 }
 
-unsigned char *getMandelbrotBuf(int x, int y, int BytePerPixel)
+unsigned char *getMandelbrotBuf(int px, int py, int BytePerPixel)
 {
-    return 0;
+    unsigned char *buf = new unsigned char[px * py * BytePerPixel];
+
+    double Im0 = 1.2;
+    double Im1 =-1.2;
+    double Re0 =-1.77;
+    double Re1 = 0.6;
+    double Im  = Im0;
+    double Re  = Re0;
+    double ImT;
+    double ReT;
+    double ReT2;
+    double arg;
+    double StepIm = (Im1 - Im0) / py;
+    double StepRe = (Re1 - Re0) / px;
+    int iterations;
+
+    int bufCounter=0;
+
+    for (int i = 0; i < py; i++)
+    {
+        for (int j = 0; j < px; j++)
+        {
+            iterations = 0;
+            ImT = Im;
+            ReT = Re;
+            arg = (Re * Re) + (Im * Im);
+            while ((arg < 2) && (iterations < 255))
+            {
+                ReT2 = (ReT * ReT) - (ImT * ImT) + Re;
+                ImT = (2 * ReT * ImT) + Im;
+                ReT = ReT2;
+                arg = (ReT * ReT) + (ImT * ImT);
+                iterations++;
+            }
+            for (int ii =0; ii < BytePerPixel; ii++)
+            {
+                buf[bufCounter++] = (unsigned char)iterations;
+            }
+            Re+=StepRe;
+        }
+        Im+=StepIm;
+        Re=Re0;
+    }
+
+    return buf;
 }
 
 int main()
 {
-
-    unsigned char *buf1;
-    buf1 = new unsigned char[3*100 * 100];
-    int iii = 0;
-    for (int i = 0; i < 100*100*3; i++)
-    {
-        buf1[iii] = (unsigned char)(rand()*(200./RAND_MAX));
-        iii++;
-    }
-
-
-    unsigned char *buf = getRundBufBW24(30000);
-
-    cout << createBmpFile("fun1.bmp", 100, 100, 24, buf) << endl;
-
-    delete []buf1;
+ //   unsigned char *buf = getRundBufBW24(3000000);
+    int x=3000;
+    int y=3000;
+    unsigned char *buf = getMandelbrotBuf(x,y,3);
+    cout << createBmpFile("fun1.bmp", x, y, 24, buf) << endl;
     delete []buf;
     cout << "Hello world!" << endl;
     return 0;
