@@ -1,7 +1,7 @@
 #include <iostream>
 //http://habrahabr.ru/post/102521/
 //https://ru.wikipedia.org/wiki/JPEG
-//http://www.kolpinkurs.ru/stati/jpeg.htm
+//http://www.kolpinkurs.ru/stati/jpeg.htmcd
 using namespace std;
 
 int main()
